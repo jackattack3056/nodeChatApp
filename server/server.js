@@ -1,18 +1,18 @@
 const path = require('path');
-const http = require('http');
 const express = require('express');
+const http = require('http');
 const socketIO = require('socket.io');
-
-
+var app = express();
+var server = http.createServer(app);
+var io = socketIO(server);
 
 const publicPath =path.join(__dirname,'../public');
 // for heroku pushing later
 const port = process.env.PORT || 3000;
-var app = express();
-// setting up server for socket.io
-var server = http.createServer(app);
 
-var io = socketIO(server);
+// setting up server for socket.io
+
+
 
 app.use(express.static(publicPath));
 
@@ -21,13 +21,13 @@ app.use(express.static(publicPath));
 io.on('connection',(socket)=>{
   console.log("New User Connected");
 
-  socket.emit('newMessage',{
-    from: 'Mike',
-    text: 'Hey, What is going on',
-    createdAT:123123
-  });
 socket.on('createMessage',(message)=>{
   console.log("MessageWorked",message);
+  io.emit('newMessage',{
+    from: message.from,
+    text: message.text,
+    createdAT: new Date().getTime()
+  });
 });
 
 socket.on('disconnect',()=>{
